@@ -1,0 +1,640 @@
+---
+layout: post
+title: "[AWS] 개발자 도구"
+description: " "
+date: 2021-11-18
+tags: [AWS]
+comments: true
+share: true
+---
+
+## 개발자 도구
+
+* [AWS CodeCommit](#AWS-CodeCommit)
+* [AWS CodeBuild](#AWS-CodeBuild)
+* [AWS CloudFormation](#AWS-CloudFormation)
+* [AWS CodeDeploy](#AWS-CodeDeploy)
+* [AWS CodePipeline](#AWS-CodePipeline)
+
+
+
+### AWS CodeCommit
+ 
+> 팀의 코드 협업을 수월하게 하는 안전하고 확장성이 뛰어난 관리형 소스 제어 서비스
+
+- 자체 소스 제어 시스템 운영:x:
+- 인프라 조정 염려 :x:
+- 안전하게 저장
+- 기존 Git 도구와 원활하게 연동
+
+#### Git
+
+> 오픈 소스 배포 버전 제어 시스템
+
+- Git CLI를 통해 AWS CodeCommit Repository 사용 가능
+
+##### 적합한 사용자
+
+- 코드 저장 및 버전 관리를 위한 안전하고 안정적이며 확장 가능한 소스 제어 시스템을 필요로 하는 소프트웨어 개발자
+- 사용이 편리하고 버전 관리 기능을 제공하는 완전 관리형 데이터 스토어
+
+##### Git 기반 소스 제어 시스템과의 차이점
+
+- 완전관리형
+
+  > 자체적으로 소스 제어 서버 호스팅, 유지 관리, 백업, 확장 필요:x:
+
+- 보안
+
+  > 파일 자동 암호화
+  >
+  > IAM와 통합되어 사용자 리포지토리에 권한 할당
+
+- 고가용성
+
+  > S3, DynamoDB와 같은 AWS 서비스에 구축
+
+- 확장성
+
+  > 파일을 몇 개든 저장
+
+- 개발 수명 주기 단축
+
+##### 버전 관리되는 S3 버킷 비교
+
+:office: S3
+
+- 개별 파일 이전 버전 복구 지원
+- 다양한 파일 간 일괄 처리된 변경 사항 추적/협업 소프트웨어 개발에 필요한 기능 :x:
+
+:couple_with_heart_man_man: CodeCommit
+
+- 다양한 파일 간의 변경 사항 배치 관리
+- 병렬 분기 생성 기능 제공
+- 버전 비교 포함
+
+#### AWS CodeCommit 사용
+
+##### 시작
+
+- Management Console 로그인 :point_right: 리포지토리 생성 :point_right: Git으로 리포지토리 사용
+
+##### 리포지토리 생성
+
+- Management Console, CLI, SDK, CodeCommit API 사용
+
+##### 리포지토리 업데이트
+
+- 콘솔에서 직접 파일 편집
+- Git으로 리포지토리 작업 수행
+- Git과 동일
+
+##### 기존 리포지토리를 AWS CodeCommit으로 가져오기
+
+- Subversion 및 Perforce 같은 기타 리포지토리
+
+  > Git 가져오기 도구 이용
+
+##### 지원되는 Git
+
+- clone, pull, push, fetch
+- 하위 모듈 지원
+
+##### 저장되는 단일 파일 최대 크기: 2GB
+
+##### 리포지토리 백업
+
+- git clone 수행
+- 백업 서버에 Git 설치 후 git clone(git pull) 명령을 사용하여 정기적으로 스냅샷을 생성하는 예약 작업 실행
+
+##### 리포지토리 복원
+
+- 리포지토리를 다시 생성 :point_right: 전체 복제를 통한 백업 or 로컬 복사본으로 데이터 업로드
+
+- 삭제
+
+  > 단방향 작업 :x:
+  >
+  > MFA 보호, IAM 정책 사용 :o:
+
+##### 코드 검토 관리
+
+- 코드 검토 지원
+- 코드 분기 권한 설정 기능 제공
+
+##### CI(지속적 통합) 시스템 :heavy_plus_sign: CodeCommit
+
+- CodeCommit :heavy_plus_sign: Jenkins
+
+##### Webhook
+
+- SNS 콘솔에서 HTTP 엔드포인트와 Webhook용 원하는 URL 지정하여 주제 생성
+- CodeCommit 콘솔에서 해당 SNS 주제를 트리거로 사용하는 리포지토리 이벤트 구성
+
+##### Git 작업 및 API 호출 기록
+
+- CloudTrail 콘솔
+
+  > Git 작업 및 API 호출, CodeCommit 이벤트 검토 가능
+
+#### 보안
+
+##### IAM으로 CodeCommit 액세스 관리
+
+- 리소스 수준 권한 지원
+- MFA(Multi-Factor Authentication) 지정
+  - 리포지토리 삭제와 같은 안전하지 않은 작업에 대한 추가적 보호 기능 제공
+- Git 클라이언트 액세스 제어
+
+##### CodeCommit이 지원하는 통신 프로토콜
+
+- HTTPS
+
+  > AWS CLI :point_right: Git 자격 증명 헬퍼 설치 :point_right: 모든 HTTPS 요청 자동 서명
+
+- SSH
+
+  > 사용자가 자체 public-privite 키 페어 생성 :point_right: 퍼블릭 키를 IAM 사용자에게 추가, 프라이빗 키는 암호화
+
+##### CodeCoimmit에 액세스하기 위해 개방해야할 포트
+
+- 22(SSH)
+- 443(HTTPS)
+- 아웃바운드 액세스 개방
+
+##### 리포지토리 암호화
+
+- 리포지토리는 상주 중에 자동으로 암호화 (고객 작업:x:)
+
+- CodeCommit은 Key Management Service(KMS)를 사용하여 리포지토리를 암호화
+  - 첫 리포지토리 생성 시 AWS 계정에 CodeCommit 키 생성
+
+##### 리포지토리 교차 계정 액세스 활성화
+
+- AWS 계정에서 IAM 역할 생성 :point_right:리포지토리에 대한 액세스 위임
+- IAM 사용자는 CLI를 구성하여 AWS Security Token Service(STS)를 사용하여 명령 실행 시 역할 담당
+
+#### 결제
+
+##### 사용료
+
+- 사용자당 1 USD
+
+##### 활성 사용자
+
+- 해당 달에 Git 요청 or AWS Management Console을 사용해 AWS CodeCommit 리포지토리에 액세스한 고유 AWS 자격 증명
+- 고유 AWS 자격 증명 사용
+
+
+
+### AWS CodeBuild
+
+> 클라우드에서 제공되는 완전관리형의 지속적 통합 서비스
+
+- 소스 코드 커파일
+- 테스트 실행
+- 배포 준비가 완료된 소프트웨어 패키지 생성
+- 자체 빌드 서버를 프로비저닝, 관리, 확장 :x: :point_right: 자동으로 확장 및 축소, 여러 빌드 동시에 처리
+
+##### 이유
+
+- 완전 관리형 환경
+  - 빌드 서버 소프트웨어 직접 설정 :x:
+  - 패치 및 유지 관리 :x:
+- 빌드 작업을 CodeBuild에 제출
+  - 모든 빌드에서 새로 생성된 후에 완료 시 삭제되는 임시 컴퓨팅 컨테이너에서 작업 실행
+- 빌드 서버 하드웨어/소프트웨어 관리 :x:
+- 빌드 볼륨에 맞게 자동으로 확장 :o:
+- 사용자가 제출한 각각의 빌드를 처리하고 별개의 빌드를 동시에 실행
+  - 빌드가 대기열에서 대기 :x:
+
+##### 릴리스 프로세스 자동 실행
+
+- CodePipeline과 통합
+  - 빌드 작업 추가
+  - 클라우드에서 실행되는 Ci/CD 프로세스 설정
+
+#### 사용
+
+##### :globe_with_meridians: 빌드 프로젝트
+
+> CodeBuild에서 빌드를 실행하는 방법 정의에 사용
+>
+> 소스 코드를 가져올 위치, 사용할 빌드 환경, 실행할 빌드 명령 및 빌드 출력을 저장할 위치와 같은 정보 포함
+
+- 빌드 환경
+  - 운영 체제, 프로그래밍 언어 실행 시간 및 CodeBuild에서 빌드 실행하는 데 사용되는 도구 조합
+
+##### 구성
+
+- 콘솔
+- AWS CLI
+
+> 소스 리포지토리 위치, 실행 시간 환경, 빌드 명령, 컨테이너가 담당하는 IAM 역할 및 빌드 실행에 필요한 컴퓨팅 클래스 지정
+>
+> buildspec.yml 파일 빌드 명령 지정
+
+##### 레파지토리
+
+- CodeCommit, S3, GitHub, GitHub Enterprise, Bitbucket
+
+##### 프레임워크
+
+- Java, Ruby, Python, Go, Node.js, Android, NET Core, PHP, Docker
+- 현재 환경 사용자 지정 :point_right: Docker 이미지 생성 후 이미지를 EC2 Container Registry 또는 Docker Hub Registry에 업로드
+
+##### Windows 빌드 런타임
+
+- .Net Core 2.0을 위해 사전 구성된 Windows 빌드 환경 제공
+- Docker 이미지 생성 :point_right: EC2 Container Registry 또는 Docker Hub Registry에 업로드 하는 환경을 직접 사용자 지정하여 .NET 프레임워크와 같은 다른 빌드 대상 지원
+
+##### 빌드 실행
+
+- 빌드 프로젝트에 정의된 클래스의 임시 컴퓨팅 컨테이너 생성
+- 컨테이너에 지정된 런타임 환경으로 로드, 소스 코드 다운
+- 프로젝트에 구성된 명령 실행, 생성된 아티팩트를 S3 버킷에 업로드 :arrow_right: 컴퓨팅 컨테이너 삭제
+
+##### 첫 번째 빌드
+
+- 콘솔 로그인 :point_right: 빌드 프로젝트 생성 :point_right: 빌드 실행
+
+##### 이전 빌드 결과
+
+- 콘솔, CloudWatch, API로 액세스
+
+##### 이전 빌드 실패 디버깅
+
+- 상세 로그 검사
+- CodeBuild Local
+
+##### 이베트에 대한 알림 또는 경고 수신
+
+- Amazon SNS 알림
+
+
+
+### AWS CloudFormation
+
+#### 일반
+
+:globe_with_meridians: CloudFormation
+
+> 개발자와 기업이 손쉽게 관련 AWS 및 타사 리소스의 모음을 쉽게 생성
+>
+> 순서에 따라 예측 가능한 방식으로 프로비저닝할 수 있는 방법 제공
+>
+> 기존 엔터프라이즈 애플리케이션, 레거시, 다양한 AWS 리소스 및 컨테이너 기반 솔루션 사용
+>
+> :point_right: 구축된 애플리케이션 인프라 요구 지원
+>
+> Elastic Beanstalk 애플리케이션 환경 지원
+>
+> 애플리케이션 데이터 저장하는 RDS 데이터 베이스와 함께 AWS Elastic Beanstalk에 호스팅되는 애플리케이션을 생성하고 관리
+
+##### 가능한 작업
+
+- 애플리케이션을 실행하는 반복적이고 예측 가능한 관련 리소스의 그룹 생성 작업을 자동화 및 간소화
+- 간단하게 애플리케이션 실행에 필요한 모든 리소스 생성, 상호 연결
+
+:globe_with_meridians: Elastic Beanstalk
+
+> 클라우드에서 손쉽게 애플리케이션을 배포하고 실행하는 환경 제공
+>
+> 개발자 도구와 통합
+>
+> 애플리케이션 수명 주기 한 곳에서 관리
+
+##### 새로운 개념
+
+- 애플리케이션을 실행하기 위해 배포해야 하는 모든 AWS 리소스를 설명
+  - JSON, YAML
+
+- AWS CloudFormation에서 템플릿을 인스턴스화할 때 단일 유닛으로 생성 및 관리되는 AWS 리소스 세트인 스택
+
+##### CloudFormation 스택의 일부인 개별 AWS 리소스 관리
+
+- 사용자는 인프라의 모든 요소에 대한 전체 권한을 그대로 유지할 수 있음
+
+##### 템플릿 요소
+
+- JSON :open_hands: YAML
+  - 템플릿 파라미터의 선택적 목록(스택 생성 시 입력 값 제공)
+  - 출력 값의 선택적 목록(웹 애플리케이션에 대한 전체 URL)
+  - 정적 구성 값을 조회하는 데 사용되는 데이터 테이블의 선택적 목록(AMI 이름)
+  - AWS 리소스 및 해당 구성 값 목록
+  - 템플릿 파일 형식 버전 번호
+
+- 스택이 구축될 때, 파라미터를 사용 :point_right: 런타임 시 템플릿 요소를 사용자 지정 가능
+- 출력값: Management Console 또는 명령줄 도구
+  - 스택의 주요 리소스(Elastic Load Balancing, RDS 데이터베이스 주소)를 사용자에게 제공
+
+##### 리소스 이름 선택
+
+- 템플릿에서 AWS 리소스에 논리적 이름 할당 :point_right: 스택 생성 :point_right: 논리적 이름을 실제 AWS 리소스 이름에 바인딩
+- 하나의 템플릿에서 여러 스택 생성
+  - 이름 충돌 :x:
+
+##### 모든 리소스에 이름 지정 :x:
+
+- 리소스에 이름을 지정하면 템플릿을 재사용하기 힘듦
+- 업데이트를 위해 리소스 교체 시 이름에 충돌 발생
+
+##### 스택 생성 시 소프트웨어 설치
+
+- 애플리케이션 부트스트랩 스크립트 세트 제공
+- CloudFormation 템플릿에 EC2 인스턴스 패키지, 파일 및 서비스 설치
+
+##### Chef/Puppet
+
+- EC2 인스턴스에서 Chef Server 및 Chef Client 소프트웨어를 부트스트랩하는 데 사용
+- Puppet Master 및 Puppet Clinet 소프트웨어 부트스트랩하는 데 사용
+
+##### EC2 태그 지정 지원
+
+- 태그 지정 기능을 지원하는 EC2 리소스에 AWS 템플릿에서 태그 지정 :o:
+
+##### EC2 인스턴스 또는 Auto Scaling 시작 구성 사용자 데이터 필드 액세스
+
+- 단순한 하뭇를 사용해 AWS 리소스의 문자열 리터럴과 속성 값 연결 :point_right: 템플릿 사용자 데이터 필드에 전달
+
+##### 스택의 리소스 중 하나가 성공적으로 생성되지 않은 경우
+
+- Automatic rollback on error 기능 활성화
+  - 오류가 발생한 시점까지 CloudFormation이 스택에 대해 성공적으로 생성한 모든 AWS 리소스 삭제
+
+- 스택이 완전히 생성되거나 전혀 생성되지 않는 점 이용
+  - 시스템 관리, 계층형 솔루션 간소화
+
+##### 스택이 삭제된 경우 데이터 저장
+
+- 템플릿 리소스에 대한 삭제 정책 정의
+- EBS 볼륨, RDS 데이터베이스 인스턴스가 삭제되기 전 스냅샷 지정
+- 스택 삭제 시, 리소스 삭제 :x: 보존 :o:
+
+##### 스택 생성 후 업데이트
+
+- 예측 가능한 제어 방식으로 기존 스택의 리소스 수정 및 업데이트
+- 템플릿을 사용해 스택 변경 사항 관리
+
+##### VPC 스택 생성
+
+- 다양한 리소스 생성 가능
+
+
+
+### AWS CodeDeploy
+
+#### 일반
+
+:globe_with_meridians: CodeDeploy
+
+> EC2 인스턴스 및 온프레미스에서 실행 중인 인스턴스를 비롯하여 모든 인스턴스에 대한 **코드 배포 자동화 서비스**
+
+- 새로운 기능 빠르게 공개
+- 배포 동안 가동 중지 시간을 줄임
+- 복잡한 앱 업데이트 작업 처리
+- 오류가 발생하기 쉬운 수동 작업 필요성 :x:
+- 수천 개의 인스턴스에 손쉽게 배포 :o:
+
+##### 사용
+
+- EC2 인스턴스에 애플리케잉션을 배포해야 하는 개발자 및 관리자
+- 뛰어난 유연성
+- 인스턴스에서 소프트웨어를 업데이트하거나 스크립트를 실행하려는 사용자
+
+##### 배포 유형
+
+- 모든 유형의 애플리케이션
+
+##### 기존 도구 체인과 연동
+
+- 구성 관리 시스템
+- CI/CD
+- 소스 제어 시스템
+
+##### Elastic Beanstalk, OpsWorks와 다른 AWS 배포 및 관리 서비스
+
+- 개발자가 EC2 모든 인스턴스에서 소프트웨어를 배포하고 업데이트하는 것에 초점을 맞춘 **빌딩 블록 서비스**
+- Elastic Beanstalk, OpsWokrs
+  - 엔드 투 엔드 애플리케이션 관리 솔루션
+
+#### 개념
+
+##### :globe_with_meridians: ​애플리케이션
+
+> 인스턴스 그룹에 배포할 소프트웨어와 구성의 모음
+
+- 그룹 내 인스턴스는 동일한 소프트웨어 실행
+- 대규모 분산 시스템
+  - 웹 계층이 하나의 애플리케이션 구성
+  - 데이터 계층이 다른 애플리케이션 구성
+
+##### :globe_with_meridians: 수정 버전
+
+> AppSpec 파일과 함께 배포할 수 있는 콘텐츠(소스코드, 빌드 후 아티팩트, 웹 페이지, 실행 파일, 배포 스크립트)의 특정 버전
+
+- GitHub, S3 버킷에서 수정 버전 액세스
+
+##### :globe_with_meridians: 배포 그룹
+
+> EC2 인스턴스, AWS Lambda 함수를 CodeDeploy 배포에 그룹화하기 위한 CodeDeploy 엔터티
+>
+> EC2 배포의 경우 :point_right: 배포 대상인 애플리케이션과 관련된 인스턴스 집합
+
+##### :globe_with_meridians: 배포
+
+###### 배포 구성
+
+> 배포 장애 처리 방법을 비롯하여 배포 그룹을 통해 배포가 진행되는 방식
+
+- 여러 인스턴스 배포 그루벵 다운 타임 없이 배포 수행
+- :speech_balloon: 애플리케이션에서 배포 그룹에 있는 50% 이상의 인스턴스가 가동되어 트래픽을 처리하도록 요구하는 경우
+  - 배포 구성에 이를 지정하여 배포로 인해 다운 타임이 발생하는 것 방지
+- 배포나 배포 그룹에 연결된 배포 구성이 없는 경우
+  - CodeDeploy는 기본적으로 한 번에 하나의 인스턴스에 배포
+
+###### 배포 파라미터 지정
+
+1. 수정 버전: 배포할 것 지정
+2. 배포 그룹: 배포 위치 지정
+3. 배포 구성: 배포할 방법 지정 (선택)
+
+##### :globe_with_meridians: AppSpec 파일
+
+> 복사할 파일과 실행할 스크립트 지정하는 구성 파일
+
+- YAML 파일 형식
+
+- 저장 위치 = 수정 버전의 루트 디렉터리
+
+- CodeDeploy Agent가 사용
+
+- 2 섹션으로 구성
+
+  - 파일 섹션
+
+    > 복사할 수정 버전의 소스 파일과 각 인스턴스의 대상 폴더 지정
+
+  - 후크 섹션
+
+    > 각 배포 단계 동안 실행할 스크립트의 위치(상대 경로) 지정
+
+```yaml
+version: 0.0
+
+os: linux
+
+files: 
+
+# You can specify one or more mappings in the files section.
+
+  - source: /
+
+    destination: /var/www/html/WordPress
+
+hooks:
+
+ # The lifecycle hooks sections allows you to specify deployment scripts.
+
+ApplicationStop: 
+
+# Step 1: Stop Apache and MySQL if running.
+
+    - location: helper_scripts/stop_server.sh
+
+BeforeInstall: 
+
+# Step 2: Install Apache and MySQL.
+
+# You can specify one or more scripts per deployment lifecycle event.
+
+    - location: deploy_hooks/puppet-apply-apache.sh
+
+    - location: deploy_hooks/puppet-apply-mysql.sh 
+
+ AfterInstall: 
+
+# Step 3: Set permissions.
+
+    - location: deploy_hooks /change_permissions.sh
+
+      timeout: 30
+
+      runas: root
+
+# Step 4: Start the server.
+
+    - location: helper_scripts/start_server.sh
+
+      timeout: 30
+
+      runas: root
+```
+
+###### 배포 수명 주기 이벤트
+
+- 배포 전 사전 설정된 일련의 단계
+
+> 배포의 일부로 코드를 실행할 수 있음
+
+:speech_balloon: 같이 사용 할 수 있는 시기 관련 예제 & 함께 지원되는 다른 배포 수명 주기 이벤트
+
+- ApplicationsStop
+
+  > 수정 버전이 다운로드되기 전에 일어나는 첫 번째 배포 수명 주기 이벤트
+  >
+  > AppSpec 파일과 스크립트 마지막에 성공적으로 배포한 수정 버전에서 가져옴
+  >
+  > 배포 준비 시 앱 점진적 중지, 현재 설치된 패키지 제거 시 사용
+
+- DownloadBundle
+
+  > 에이전트가 수정 버전 파일을 인스턴스의 임시 위치로 복사
+  >
+  > 에이전트에 예약
+  >
+  > 사용자 스크립트 실행 :x:
+
+- BeforInstall
+
+  > 파일 복호화, 현재 버전의 백업 생성 등 설치 전 작업에 사용
+
+- Install
+
+  > 에이전트는 수정 버전 파일을 임시 위치에서 최종 대상 폴더로 복사
+
+- AfterInstall
+
+  > 애플리케이션 구성이나 파일 권한 변경 등의 작업에 사용
+
+- ApplicationStart
+
+  > ApplicationsSTop 이벤트 동안 중지된 서비스를 다시 시작하는 데 사용
+
+- ValidateService
+
+  > 마지막 수명 주기 이벤트
+  >
+  > 배포가 성공적으로 완료되었는지 확인
+
+### AWS CodePipeline
+
+> 소프트웨어를 릴리스하는 데 필요한 단계를 **모델링** **시각화** **자동화** 해주는 지속적 전달 서비스
+
+- 정의된 워크플로우에따라 코드 변경이 있을 때마다 애플리케이션 빌드, 테스트, 배포
+  - 코드 빌드
+  - 사전 프로덕션 환경으로 배포
+  - 애플리케이션 테스트 및 프로덕션으로 릴리스를 비롯한 전체 릴리스 프로세스 모델링
+- 파트너 도구 및 자체 사용자 지정 도구를 릴리스 프로세스 중 원하는 단계에 통합 :point_right: 포괄적이며 지속적 전달 솔루션 형성
+- 새로운 변경 사항을 일관된 품질 검사 세트를 통해 실행 :point_right: 소프트웨어 업데이트의 속도와 품질 향상
+
+##### 지속적 전달
+
+> 프로덕션에 릴리스하기 위한 코드 변경이 자동으로 빌드, 테스트, 준비되는 소프트웨어 개발 방식
+
+#### 개념
+
+![image-20201007093635221](./image/image-20201007093635221.png)
+
+##### :globe_with_meridians: 파이프라인
+
+> 소프트웨어 변경 사항이 릴리스 프로세스에 적용되는 방법을 설명하는 워크플로우 구성
+>
+> 단계 및 자업 시퀀스로 워크플로우 정의
+
+##### :globe_with_meridians: 수정 버전
+
+> 파이프라인에서 정의한 소스 위치에 이루어진 변경 사항
+
+- 소스 코드, 빌드 결과, 구성, 데이터
+- 동시에 여러 개의 수정 버전 존재
+
+##### :globe_with_meridians: 스테이지
+
+> 하나 이상의 작업으로 이루어진 그룹
+
+- 파이프라인에는 2개 이상의 스테이지 존재
+
+##### :globe_with_meridians: 작업
+
+> 수정 버전에서 수행한 일
+
+- 단계 구성에서 정의한 대로 지정된 순서나 직렬/병렬로 발생
+
+##### :globe_with_meridians: 아티팩트
+
+> 작업이 파일 또는 파일 세트에 실행될 때 파일
+>
+> 파이프라인 이후 작업에 따라 작동
+
+- 소스 작업: 코드의 최신 버전을 소스 아티팩트로 출력
+- 빌드 작업: 읽음
+- 컴파일 후 빌드 작업: 빌드 출력을 다른 아티팩트로 업로드 이후 배포 작업이 읽음
+
+##### :globe_with_meridians: 전환
+
+> 파이프라인의 시트에지는 전환을 거쳐 연결 :point_right: CodePipeline 콘솔에서 화살표로 표시
+
+- 스테이지 작업이 성공적으로 완료된 수정 버전은 자동으로 전환 화살표로 표시
+
+- 스테이지 사이 활성화/비화성화 가능

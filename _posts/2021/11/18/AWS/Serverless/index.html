@@ -1,0 +1,343 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests;">
+
+    <title>My Blog Maker</title>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hi+Melody&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Architects Daughter', 'Hi Melody';
+        }
+
+        .Blog {
+            margin: 10px auto;
+            width: 60%;
+        }
+
+        .Blog .title {
+            text-align: center;
+        }
+
+        .Posts {
+            display: flex;
+            margin: 10px 0;
+            justify-items: center;
+            justify-content: space-between;
+        }
+
+        .Post {
+            border: 1px solid #ccc;
+            margin: 10px 10px;
+            padding: 20px;
+            box-shadow: 2px 3px #999;
+            border-radius: 5px;
+            width: 300px;
+            position: relative;
+        }
+
+        .Post .postTitle {
+            text-align: left;
+        }
+
+        .Post .author {
+            position: absolute;
+            bottom: 0%;
+            right: 0%;
+            box-sizing: border-box;
+            margin: 10px;
+            font-style: italic;
+        }
+
+        .Post .author::before {
+            content: "- "
+        }
+
+        .FullPost {
+            border: 1px solid #eee;
+            box-shadow: 2px 3px #999;
+            margin: 10px;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+        }
+
+        .FullPost .postTitle {
+            text-align: left;
+        }
+
+        .FullPost .content {
+            font-size: 1.2rem;
+            line-height: 1.5em;
+        }
+
+        .NewPost {
+            font-family: 'Architects Daughter', 'Hi Melody';
+            border: 1px solid #eee;
+            box-shadow: 2px 3px #999;
+            border-radius: 5px;
+            margin: 10px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .NewPost .title {
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .NewPost .form-row {
+            display: flex;
+            flex-direction: column;
+            margin: 10px;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .NewPost .form-row label {
+            text-align: left;
+            padding: 10px;
+            font-weight: bold;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .NewPost .form-row .postTitle,
+        .NewPost .form-row .content,
+        .NewPost .form-row .author {
+            width: 100%;
+        }
+
+        .NewPost .postTitle {
+            font-family: 'Architects Daughter', 'Hi Melody';
+            font-size: 2rem;
+        }
+
+        .NewPost .form-row .content {
+            font-family: 'Architects Daughter', 'Hi Melody';
+            min-height: 200px;
+            font-size: 1.2rem;
+            line-height: 1.5em;
+        }
+
+        input {
+            font-family: 'Architects Daughter', 'Hi Melody';
+            min-height: 50px;
+            min-width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="App">
+        <div class="Blog">
+            <h1 class="title">Blog List</h1>
+            <!-- <div class="Posts">
+                <div class="Post">
+                    <h2 class="postTitle">The Life as it ought to be!</h2>
+                    <div class="author">Amrish</div>
+                </div>
+                <div class="Post">
+                    <h2 class="postTitle">The Life as you ought to live</h2>
+                    <div class="author">Aarushi</div>
+                </div>
+                <div class="Post">
+                    <h2 class="postTitle">The Life</h2>
+                    <div class="author">Anishka</div>
+                </div>
+            </div> -->
+
+                <script>
+                    var html = "";
+                    $.ajax({
+                        type: "GET",
+                        headers: {
+                            "X-Api-Key": "Fzwx4nsbuw31gOBJo1elr4WPye21Gl8N2Pl60Nux"
+                        },
+                        url: 'https://92ziazl1wi.execute-api.ap-northeast-2.amazonaws.com/2020-10-22/board',
+                        crossDomain: true,
+                        dataType: 'json',
+                        contentType: "application.json",
+
+
+                        success: function (res) {
+                            var lists = res.Items;
+                            lists.sort(function(a, b){
+                                return a.no - b.no;
+                            });
+                            console.log(lists);
+                            for(var i in lists){
+                                html += '<div class="FullPost">';
+                                html += '<h2 class="postTitle">' + "NO: " + lists[i].no + "<br>" + lists[i].title + "</h2>";
+                                html += '<div class="content">' + lists[i].content + "</div><br>";
+                                html += '<input type="button" value="DELETE" onClick="deletee(' + lists[i].no+')" />'
+                                html += '</div>';
+                            }
+                            $('#fortest').html(html);
+                        },
+                        error: function (res, status, error) {
+                            console.log(error);
+                        }
+                    });
+                </script>
+                <div id="fortest"></div>
+
+                <div class="FullPost">
+                    <h2 class="postTitle"> NO: 1 <br> AWS Serverless TEST TITLE</h2>
+                    <div class="content"> 간단한 테스트 내용</div><br>
+                    <input type="button" value="DELETE" onClick="deletee(1)" />
+                </div>
+
+            <div class="NewPost">
+                <h3 class="title">Create a New Post</h3>
+                <div class="form">
+                    <div class="form-row">
+                        <label for=postTitle>No</lable>
+                            <input name="no" class="postTitle" id="no" style="width:60px" />
+                    </div>
+                    <div class="form-row">
+                        <label for=postTitle>Title</lable>
+                            <input name="title" class="postTitle" id="title" />
+                    </div>
+                    <div class="form-row">
+                        <label for=content>Content</lable>
+                            <textarea name="content" class="content" id="content"></textarea>
+                    </div>
+                    <div class="form-row">
+
+                        <div style="text-align: center;">
+                            <!-- <input type="button" value="GET" onClick="get()" /> -->
+                            <script>
+                                const API_URL = 'https://92ziazl1wi.execute-api.ap-northeast-2.amazonaws.com/2020-10-22/board';
+                                function get() {
+                                    var form_data = {
+                                        no: $("#no").val(),
+                                        title: $("#title").val(),
+                                        content: $("#content").val()
+                                    }
+
+                                    $.ajax({
+                                        type: "GET",
+                                        headers: {
+                                            "X-Api-Key": "Fzwx4nsbuw31gOBJo1elr4WPye21Gl8N2Pl60Nux"
+                                        },
+                                        url: API_URL,
+                                        crossDomain: true,
+                                        dataType: 'json',
+                                        contentType: "application.json",
+
+                                        success: function (res) {
+                                            $("#fortest").load(window.location.href + "#fortest");
+                                        },
+                                        error: function (res, status, error) {
+                                            console.log(error);
+                                        }
+                                    });
+
+                                    // fetch(API_URL,
+                                    //     {
+                                    //         headers: {
+                                    //             'Accept': 'application/json'
+                                    //         }
+                                    //     }
+                                    // ).then(res => res.json())
+                                    //     .then(data => console.log(data))
+                                    //     .catch(err => console.error(err));
+                                }
+                            </script>
+
+                            <input type="button" value="POST" onClick="post()" />
+                            <script>
+                                function post() {
+                                    form_data = {
+                                        httpMethod: "POST",
+                                        no: Number($("#no").val()),
+                                        title: $("#title").val(),
+                                        content: $("#content").val()
+                                    }
+                                    $.ajax({
+                                        type: "POST",
+                                        headers: {
+                                            "X-Api-Key": "Fzwx4nsbuw31gOBJo1elr4WPye21Gl8N2Pl60Nux"
+                                        },
+                                        url: API_URL,
+                                        crossDomain: true,
+                                        data: JSON.stringify(form_data),
+                                        dataType: 'json',
+                                        contentType: "application.json",
+
+                                        success: function (res) {
+                                            window.location.reload();
+                                        },
+                                        error: function (res, status, error) {
+                                            console.log(error);
+                                        }
+                                    });
+                                }
+                            </script>
+
+                            <input type="button" value="UPDATE"" onClick=" put()" />
+                            <script>
+                                function put() {
+                                    form_data = {
+                                        httpMethod: "PUT",
+                                        no: Number($("#no").val()),
+                                        title: $("#title").val(),
+                                        content: $("#content").val()
+                                    }
+                                    $.ajax({
+                                        type: "PUT",
+                                        headers: {
+                                            "X-Api-Key": "Fzwx4nsbuw31gOBJo1elr4WPye21Gl8N2Pl60Nux"
+                                        },
+                                        url: API_URL,
+                                        crossDomain: true,
+                                        data: JSON.stringify(form_data),
+                                        dataType: 'json',
+                                        contentType: "application.json",
+                                        success: function (res) {
+                                            window.location.reload();
+                                        }
+                                    });
+                                }
+                            </script>
+
+                            <script>
+                                function deletee(number) {
+                                    form_data = {
+                                        httpMethod: "DELETE",
+                                        no: number
+                                    }
+                                    $.ajax({
+                                        type: "DELETE",
+                                        headers: {
+                                            "X-Api-Key": "Fzwx4nsbuw31gOBJo1elr4WPye21Gl8N2Pl60Nux"
+                                        },
+                                        url: API_URL,
+                                        crossDomain: true,
+                                        data: JSON.stringify(form_data),
+                                        dataType: 'json',
+                                        contentType: "application.json",
+                                        success: function (res) {
+                                            window.location.reload();
+                                        }
+                                    });
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>
