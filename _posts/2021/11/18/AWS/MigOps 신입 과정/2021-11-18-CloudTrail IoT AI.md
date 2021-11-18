@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[MigOps] CloudTrail"
+title: "[MigOps] CloudTrail IoT AI"
 description: " "
 date: 2021-11-18
 tags: [MigOps]
